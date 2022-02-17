@@ -1,0 +1,8 @@
+
+type Query {
+    School: [school] @all
+}
+
+type school {
+    school_name: String
+}
