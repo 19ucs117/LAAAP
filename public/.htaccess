@@ -1,23 +1,21 @@
-
 <IfModule mod_rewrite.c>
-RewriteEngine On
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
 
-##
-## You may need to uncomment (remove #) the following line for some hosting environments,
-## if you have installed to a subdirectory, enter the name here also.
-## Example: for https://site.com enter: "/", for https://site.com/something enter: "/something/"
-##
-# RewriteBase /
+    RewriteEngine On
 
-##
-## Uncomment following lines to force HTTPS.
-##
-# RewriteCond %{HTTPS} off
-# RewriteRule (.*) https://%{SERVER_NAME}/$1 [R,L]
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
-RewriteRule ^(.*) - [E=BASE:%1]
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
 
-RewriteCond %{REQUEST_URI} !^public
-RewriteRule ^(.*)$ public/$1 [L]
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
 </IfModule>
