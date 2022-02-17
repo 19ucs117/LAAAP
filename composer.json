@@ -14,7 +14,10 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.40",
         "laravel/tinker": "^2.5",
-        "tymon/jwt-auth": "^2.1.2"
+        "mll-lab/laravel-graphql-playground": "^2.5",
+        "nuwave/lighthouse": "^5.35",
+        "rebing/graphql-laravel": "^8.0",
+        "tymon/jwt-auth": "^1.0.0-beta.3@dev"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
