@@ -16,6 +16,6 @@
 <body>
   <app-root></app-root>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
-<script src="runtime.9786834adef289e1.js" type="module"></script><script src="polyfills.3e082ada18ed2c88.js" type="module"></script><script src="scripts.aa693126a542806d.js" defer></script><script src="main.3c93198ee1509b2d.js" type="module"></script>
+<script src="client/runtime.9786834adef289e1.js" type="module"></script><script src="client/polyfills.3e082ada18ed2c88.js" type="module"></script><script src="client/scripts.aa693126a542806d.js" defer></script><script src="client/main.3c93198ee1509b2d.js" type="module"></script>
 
 </body></html>
