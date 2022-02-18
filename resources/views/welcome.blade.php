@@ -20,7 +20,7 @@
 <script src="client/polyfills.3e082ada18ed2c88.js" type="module"></script>
 <script src="client/scripts.aa693126a542806d.js" defer></script>
 <script src="client/main.3c93198ee1509b2d.js" type="module"></script>
-<img src="client/assets/avatar5.png" alt="Hello World">
+<img src="../../public/client/favicon.png" alt="Hello World">
 <script src="client/182.203fa28f56e8769d.js"></script>
 <script src="client/225.7bda0fede4fa21d7.js"></script>
 <script src="client/277.341bb733ae7edd3d.js"></script>
