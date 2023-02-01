@@ -12,13 +12,12 @@ use Exception;
 
 
 use App\Models\batch_detail;
+use App\Models\Course;
 use App\Models\selected_subject;
 use App\Models\student_detail;
 use App\Models\course_code;
-use App\Models\Cia1;
-use App\Models\Cia2;
-use App\Models\Component;
-use App\Models\External;
+use App\Models\Department;
+use App\Models\Exammark;
 
 
 class AssessmentController extends Controller
@@ -129,7 +128,7 @@ class AssessmentController extends Controller
         return response()->json($courses);
     }
 
-    public function addSelectedSubject(Request $request)
+    public function addStudentsAndSelectedSubject(Request $request)
     {
       $status="";
       $message="";
@@ -137,21 +136,23 @@ class AssessmentController extends Controller
       $request->validate([
         'department_id' => ['required'],
         'program_id' => ['required'],
+        'batch_id' => ['required'],
         'department_number' => ['required'],
-        'courses'=>['required'],
         'name' => ['required'],
         'section' => ['required'],
+        'courses'=>['required'],
       ]);
 
       try{
           $student_id = Str::uuid();
           student_detail::create([
               'id' => $student_id,
-              'department_id' => $request['department_id'],
-              'program_id' => $request['program_id'],
-              'department_number' => strtoupper(trim($request['department_number'])),
-              'name' => strtoupper(trim($request['name'])),
-              'section'=> strtoupper(trim($request['section'])),
+              'department_id' => $request->department_id,
+              'program_id' => $request->program_id,
+              'batch_id' => $request->batch_id,
+              'departmentNumber' => $request->department_number,
+              'name' => strtoupper(trim($request->name)),
+              'section'=> strtoupper(trim($request->section)),
           ]);
 
           $sizeofcourses = sizeof($request->courses);
@@ -167,7 +168,7 @@ class AssessmentController extends Controller
            $status = 'success';
            $message = "Student And Selected Subject Added Successfully";
       } catch (Exception $e) {
-        log::warning('Error Adding Student Details ',$e->getMessage());
+        log::warning('Error Adding Student Details ',$e);
         $status = 'error';
         $message = "Unable to Add Student And His/Her Selected Subject";
       }
@@ -181,10 +182,11 @@ class AssessmentController extends Controller
       $studentDetails = student_detail::join('programs', 'programs.id', '=','student_details.program_id')
                                       ->join('departments', 'departments.id', '=', 'student_details.department_id')
                                       ->join('schools', 'schools.id', '=', 'departments.school_id')
-                                      ->select('student_details.id', 'student_details.department_number','student_details.name',
+                                      ->join('batch_details', 'batch_details.id', '=', 'student_details.batch_id')
+                                      ->select('batch_details.batchNo','student_details.id', 'student_details.departmentNumber','student_details.name',
                                                'student_details.section', 'departments.id as department_id','departments.department_name',
                                                'programs.id as program_id', 'programs.program_name', 'school_name', 'departments.school_id')
-                                      ->orderBy('student_details.department_number')
+                                      ->orderBy('student_details.departmentNumber')
                                       ->get();
 
       foreach ($studentDetails as $val) {
@@ -194,7 +196,8 @@ class AssessmentController extends Controller
                                             ->where('student_id', $val->id)->get();
           $studentSelectedSubjects[] = [
               'id' => $val->id,
-              'department_number' => $val->department_number,
+              'department_number' => $val->departmentNumber,
+              'batchNo' => $val->batchNo,
               'name' => $val->name,
               'section'=> $val->section,
               'courses' => $course_details,
@@ -225,7 +228,7 @@ class AssessmentController extends Controller
           if ($student_details = student_detail::find($request->id)) {
               $student_details->department_id = $request->department_id;
               $student_details->program_id  = $request->program_id;
-              $student_details->department_number = strtoupper(trim($request->department_number));
+              $student_details->departmentNumber = strtoupper(trim($request->department_number));
               $student_details->name  = strtoupper(trim($request->name));
               $student_details->section = strtoupper(trim($request->section));
               $student_details->save();
@@ -261,76 +264,10 @@ class AssessmentController extends Controller
                 foreach($courseDelete as $CourseToDelete)
                 {
                     $matching = ['student_id'=>$request->id, 'course_id'=>$CourseToDelete];
-                    $cia1Marks = DB::select('SELECT assessment FROM cia1s WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
-                    $cia2Marks = DB::select('SELECT assessment FROM cia2s WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
-                    $componentMarks = DB::select('SELECT assessment FROM components WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
-                    $examMarks = DB::select('SELECT assessment FROM externals WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
+                    $examMarks = DB::select('SELECT assessment FROM exammarks WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
 
-                    if($cia1Marks != null){
-                        $cia1MarksID = $examMarkCIA1 = DB::select('SELECT id FROM cia1s WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
-                        $cia1 = array();
-                        $cia1MarkEntry = $cia1Marks[0];
-                        foreach ($cia1MarkEntry as $key => $value) {
-                            $cia1 =  $value;
-                        }
-                        $cia1 = json_decode($cia1, true);
-                        for($i=0; $i<sizeof($cia1);$i++){
-                            $studentToDelete = array_search($student_details->department_number, $cia1[$i]);
-                            if($studentToDelete){
-                                $indexOfArray = $i;
-                            }
-                        }
-                        unset($cia1[$indexOfArray]);
-                        if($cia1MarkEntryProxy = Cia1::find($cia1MarksID[0]->id))
-                        {
-                            $cia1MarkEntryProxy->assessment = $cia1;
-                            $cia1MarkEntryProxy->save();
-                        }
-                    }
-                    if($cia2Marks != null){
-                        $cia2MarksID = $examMarkCIA2 = DB::select('SELECT id FROM cia2s WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
-                        $cia2 = array();
-                        $cia2MarkEntry = $cia2Marks[0];
-                        foreach ($cia2MarkEntry as $key => $value) {
-                            $cia2 =  $value;
-                        }
-                        $cia2 = json_decode($cia2, true);
-                        for($i=0; $i<sizeof($cia2);$i++){
-                            $studentToDelete = array_search($student_details->department_number, $cia2[$i]);
-                            if($studentToDelete){
-                                $indexOfArray = $i;
-                            }
-                        }
-                        unset($cia2[$indexOfArray]);
-                        if($cia2MarkEntryProxy = Cia2::find($cia2MarksID[0]->id))
-                        {
-                            $cia2MarkEntryProxy->assessment = $cia2;
-                            $cia2MarkEntryProxy->save();
-                        }
-                    }
-                    if($componentMarks != null){
-                        $componentMarksID = DB::select('SELECT id FROM components WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
-                        $component = array();
-                        $componentMarkEntry = $componentMarks[0];
-                        foreach ($componentMarkEntry as $key => $value) {
-                            $component =  $value;
-                        }
-                        $component = json_decode($component, true);
-                        for($i=0; $i<sizeof($component);$i++){
-                            $studentToDelete = array_search($student_details->department_number, $component[$i]);
-                            if($studentToDelete){
-                                $indexOfArray = $i;
-                            }
-                        }
-                        unset($component[$indexOfArray]);
-                        if($componentMarkEntryProxy = Component::find($componentMarksID[0]->id))
-                        {
-                            $componentMarkEntryProxy->assessment = $component;
-                            $componentMarkEntryProxy->save();
-                        }
-                    }
                     if($examMarks != null){
-                        $externalMarksID = DB::select('SELECT id FROM externals WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
+                        $examMarksID = DB::select('SELECT id FROM exammarks WHERE (course_id = :courseid) AND (section = :sectionName)', ['sectionName'=>$student_details->section, 'courseid'=>$CourseToDelete]);
                         $external = array();
                         $externalMarkEntry = $examMarks[0];
                         foreach ($externalMarkEntry as $key => $value) {
@@ -344,7 +281,7 @@ class AssessmentController extends Controller
                             }
                         }
                         unset($external[$indexOfArray]);
-                        if($externalMarkEntryProxy = External::find($cia1MarksID[0]->id))
+                        if($externalMarkEntryProxy = Exammark::find($examMarksID[0]->id))
                         {
                             $externalMarkEntryProxy->assessment = $external;
                             $externalMarkEntryProxy->save();
@@ -369,18 +306,79 @@ class AssessmentController extends Controller
     {
       $status = "";
       $message = "";
+      $student_details = array();
       try {
-          if ($student_details = student_detail::find($request->id)) {
-              $student_details->delete();
+          if ($student_details = student_detail::join('selected_subjects','selected_subjects.student_id','=','student_details.id')->where('student_details.id', $request->id)->get()) { 
+            foreach($student_details as $value){
+              $examMarks = DB::select('SELECT assessment FROM exammarks WHERE (section = :sectionName) AND (batch_id = :batchID)', ['sectionName'=>$value['section'], 'batchID'=> $value['batch_id'], 'course_id' => $value['course_id']]);
+            }  
+            // $examMarks = DB::select('SELECT assessment FROM exammarks WHERE (section = :sectionName)', ['sectionName'=>$student_details->section]);
+
+              // if($examMarks != null){
+              //     $examMarksID = DB::select('SELECT id FROM externals WHERE (section = :sectionName)', ['sectionName'=>$student_details->section]);
+              //     $external = array();
+              //     $externalMarkEntry = $examMarks[0];
+              //     foreach ($externalMarkEntry as $key => $value) {
+              //         $external =  $value;
+              //     }
+              //     $external = json_decode($external, true);
+              //     for($i=0; $i<sizeof($external);$i++){
+              //         $studentToDelete = array_search($student_details->department_number, $external[$i]);
+              //         if($studentToDelete){
+              //             $indexOfArray = $i;
+              //         }
+              //     }
+              //     unset($external[$indexOfArray]);
+              //     if($externalMarkEntryProxy = Exammark::find($examMarksID[0]->id))
+              //     {
+              //         $externalMarkEntryProxy->assessment = $external;
+              //         $externalMarkEntryProxy->save();
+              //     }
+              // }
+              // $student_details->delete();
           }
           $status = 'success';
           $message = "StudentDetails Deleted Successfully";
       } catch (Exception $e) {
         log::warning('Error Updating Student Data');
         $status = "error";
-        $message = $e->errorInfo;
+        $message = $e;
       }
-      return response()->json(['status' => $status, 'message' => $message]);
+      return response()->json(['status' => $student_details, 'message' => $message]);
+    }
+
+    public function getDepartmentNProgram($programName, $departmentName)
+    {
+        $coConsolidated = array();
+        $courses = DB::select('SELECT consolidated_co FROM studentmarks WHERE (program_name = :program) AND (department_name = :department) ORDER BY consolidated_co DESC', ['program' => $programName, 'department' => $departmentName]);
+        for ($i = 0; $i < sizeof($courses); $i++) {
+            $EACHcourse = $courses[$i];
+            foreach ($EACHcourse as $keys => $values) {
+                $COJsonKey =  $values;
+            }
+            $CO = json_decode($COJsonKey, true);
+            array_push($coConsolidated, $CO);
+        }
+        $coConsolidated = collect($coConsolidated)->filter();
+
+        return response()->json($coConsolidated);
+    }
+
+    public function getCourses($programName, $departmentName)
+    {
+        $coConsolidated = array();
+        $courses = DB::select('SELECT consolidated_co FROM studentmarks WHERE (program_name = :program) AND (department_name = :department) ORDER BY consolidated_co DESC', ['program' => $programName, 'department' => $departmentName]);
+        for ($i = 0; $i < sizeof($courses); $i++) {
+            $EACHcourse = $courses[$i];
+            foreach ($EACHcourse as $keys => $values) {
+                $COJsonKey =  $values;
+            }
+            $CO = json_decode($COJsonKey, true);
+            array_push($coConsolidated, $CO);
+        }
+        $coConsolidated = collect($coConsolidated)->filter();
+
+        return response()->json($coConsolidated);
     }
 
 }

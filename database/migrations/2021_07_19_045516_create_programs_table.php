@@ -25,6 +25,7 @@ class CreateProgramsTable extends Migration
             $table->foreign('school_id')->references('id')->on('schools')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
+            $table->unique(['department_id', 'program_name']);
         });
     }
 

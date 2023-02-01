@@ -27,6 +27,7 @@ class CreatePsoposTable extends Migration
             $table->foreign('program_id')->references('id')->on('programs')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
+            $table->unique(['program_id', 'school_id']);
         });
     }
 

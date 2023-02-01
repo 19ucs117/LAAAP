@@ -17,7 +17,8 @@ class CreateStudentDetailsTable extends Migration
             $table->uuid('id')->primary();
             $table->uuid('department_id');
             $table->uuid('program_id');
-            $table->string('department_number');
+            $table->uuid('batch_id');
+            $table->string('departmentNumber');
             $table->string('name');
             $table->string('section');
             $table->timestamps();
@@ -27,7 +28,10 @@ class CreateStudentDetailsTable extends Migration
             $table->foreign('department_id')->references('id')->on('departments')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
-            $table->unique(['department_number']);
+            $table->foreign('batch_id')->references('id')->on('batch_details')
+                                                        ->onUpdate('cascade')
+                                                        ->onDelete('cascade');
+            $table->unique(['department_id', 'program_id', 'departmentNumber']);
         });
     }
 

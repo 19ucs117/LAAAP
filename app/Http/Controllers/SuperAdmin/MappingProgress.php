@@ -36,7 +36,7 @@ class MappingProgress extends Controller
     {
       $isCompleted = 0;
       $isCompletedVisionMission = vissionMission::all()->count();
-      $nocompletedPos = Peo::all()->unique('school_id')->count();
+      $nocompletedPeos = Peo::all()->unique('school_id')->count();
       $noOfschools = school::all()->count();
       if ($nocompletedPeos == $noOfschools) {
         if ($isCompletedVisionMission != 0) {

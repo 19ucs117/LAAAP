@@ -19,6 +19,6 @@ class batch_detail extends Model
         'department_id',
         'program_id',
         'batchNo',
-        'NoSections',
+        'NoSections'
     ];
 }

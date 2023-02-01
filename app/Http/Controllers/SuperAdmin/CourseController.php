@@ -77,7 +77,7 @@ class CourseController extends Controller
              //   return response()->json($schools);
              // }
 
-           $schools->school_name = $request->input('school_name');
+           $schools->school_name = trim(strtoupper($request->input('school_name')));
            $schools->save();
 
            $status = 'success';
@@ -228,13 +228,13 @@ class CourseController extends Controller
          ]);
          try {
              if ($department = Department::find($request->id)) {
-                 $department->department_name = $request->department_name;
+                 $department->department_name = trim(strtoupper($request->department_name));
                  $department->updated_by = auth()->user()->id;
                  $department->save();
 
                  foreach ($request->programs as $programData) {
                      if ($program = program::find($programData['id'])) {
-                         $program->program_name = $programData['program_name'];
+                         $program->program_name = trim(strtoupper($programData['program_name']));
                          $program->save();
                      }
                  }
@@ -378,11 +378,12 @@ class CourseController extends Controller
      }
    }
 
-     public function editUser(Request $request, $userId)
+     public function edituserSuperAdmin(Request $request)
      {
        $status="";
        $message="";
        $request->validate([
+         'id' => ['required'],
          'name' => ['required'],
          'email' => ['required'],
          'department_number' => ['required'],
@@ -391,7 +392,7 @@ class CourseController extends Controller
          'role_id' => ['required'],
        ]);
        try {
-           if ($user = User::find($userId)) {
+           if ($user = User::find($request->id)) {
              $user->department_number = $request->department_number;
              $user->department_id     = $request->department_id;
              $user->name              = $request->name;
@@ -403,7 +404,7 @@ class CourseController extends Controller
            $status = 'success';
            $message = "User Updated Successfully";
        } catch (Exception $e) {
-           Log::warning('Error Updating User',$e->getMessage());
+           Log::warning('Error Updating User',$e);
            $status = 'error';
            $message = "Unable to Update User";
 

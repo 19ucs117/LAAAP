@@ -20,6 +20,7 @@ class CreateMissionvisionposTable extends Migration
           $table->uuid('saved_by');
           $table->boolean('submit')->default(0);
           $table->timestamps();
+          $table->unique('school_id');
         });
     }
 

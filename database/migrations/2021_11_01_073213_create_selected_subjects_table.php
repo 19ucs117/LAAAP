@@ -21,6 +21,9 @@ class CreateSelectedSubjectsTable extends Migration
             $table->foreign('course_id')->references('id')->on('course_codes')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
+            $table->foreign('student_id')->references('id')->on('student_details')
+                                                          ->onUpdate('cascade')
+                                                          ->onDelete('cascade');
             
             $table->unique(['student_id', 'course_id']);
         });

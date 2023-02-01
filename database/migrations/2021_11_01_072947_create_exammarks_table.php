@@ -15,6 +15,7 @@ class CreateExammarksTable extends Migration
     {
         Schema::create('exammarks', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('batch_id');
             $table->uuid('department_id');
             $table->uuid('course_id');
             $table->string('section');
@@ -27,7 +28,10 @@ class CreateExammarksTable extends Migration
             $table->foreign('department_id')->references('id')->on('departments')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
-            $table->unique(['course_id','section']);
+            $table->foreign('batch_id')->references('id')->on('batch_details')
+                                                          ->onUpdate('cascade')
+                                                          ->onDelete('cascade');
+            $table->unique(['course_id','section', 'batch_id']);
         });
     }
 

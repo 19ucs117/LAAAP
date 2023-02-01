@@ -21,6 +21,7 @@ class Exammark extends Model
     protected $fillable = [
       'id',
       'department_id',
+      'batch_id',
       'course_id',
       'section',
       'assessment',

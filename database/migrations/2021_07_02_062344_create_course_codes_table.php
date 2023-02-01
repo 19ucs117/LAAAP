@@ -27,7 +27,7 @@ class CreateCourseCodesTable extends Migration
             $table->uuid('created_by');
             $table->uuid('updated_by');
             $table->timestamps();
-            $table->unique(['course_code','semester']);
+            $table->unique(['course_code','semester','program_id']);
             $table->foreign('department_id')->references('id')->on('departments')
                                                               ->onUpdate('cascade')
                                                               ->onDelete('cascade');

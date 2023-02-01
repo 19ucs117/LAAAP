@@ -24,7 +24,6 @@ class CreateSyllabusCoursesTable extends Migration
             $table->uuid('created_by');
             $table->uuid('updated_by');
             $table->timestamps();
-
         });
     }
 

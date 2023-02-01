@@ -80,39 +80,17 @@ class InitialSeed extends Seeder
             program::insert($program);
             $users = [
                 [
-                    'id'=>$sr,
-                    'department_number' => 'SA1',
-                    'department_id' => $dep1,
-                    'is_active' => 'yes',
-                    'name' => 'SA John',
-                    'email' => 'sa@gmail.com',
-                    'phone_number' => 1234567890,
-                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-                    'role_id' => 1,
-                    'profile' => 'dist/img/user-image.png'
-                ], [
                     'id'=>Str::uuid(),
-                    'department_number' => 'AD1',
+                    'department_number' => 'loyola01',
                     'department_id' => $dep1,
                     'is_active' => 'yes',
-                    'name' => 'AD John',
-                    'email' => 'ad@gmail.com',
+                    'name' => 'Dean of Academics',
+                    'email' => 'dean@loyolacolege.edu',
                     'phone_number' => 1234567890,
-                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+                    'password' => bcrypt('superadmin'),
                     'role_id' => 1,
                     'profile' => 'dist/img/user-image.png'
                 ],[
-                    'id'=>Str::uuid(),
-                    'department_number' => '19PCS001',
-                    'department_id' => $dep2,
-                    'is_active' => 'yes',
-                    'name' => 'John Amala Fortunate',
-                    'email' => '19pcs001@gmail.com',
-                    'phone_number' => 1234567890,
-                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-                    'role_id' => 5,
-                    'profile' => 'dist/img/user-image.png'
-                ], [
                     'id'=>Str::uuid(),
                     'department_number' => '19UCS117',
                     'department_id' => $dep2,

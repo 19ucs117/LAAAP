@@ -16,10 +16,11 @@ class CreateDepartmentsTable extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('school_id');
-            $table->string('department_name');
+            $table->string('department_name')->unique();
             $table->uuid('created_by');
             $table->uuid('updated_by');
             $table->timestamps();
+            $table->unique(['school_id','department_name']);
         });
     }
 

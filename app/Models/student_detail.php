@@ -16,7 +16,8 @@ class student_detail extends Model
     'id',
     'department_id',
     'program_id',
-    'department_number',
+    'batch_id',
+    'departmentNumber',
     'name',
     'section',
   ];

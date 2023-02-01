@@ -38,7 +38,7 @@ class CreateAssignstaffsTable extends Migration
             $table->foreign('department_id')->references('id')->on('departments')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
-            $table->unique(['course_id','section','user_id']);
+            $table->unique(['course_id','section', 'batch_id']);
         });
     }
 

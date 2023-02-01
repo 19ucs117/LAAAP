@@ -23,6 +23,7 @@ class CreatePeoposTable extends Migration
           $table->foreign('school_id')->references('id')->on('schools')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
+          $table->unique('school_id');
         });
     }
 

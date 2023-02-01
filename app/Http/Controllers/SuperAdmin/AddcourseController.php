@@ -14,6 +14,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use PhpParser\Node\Stmt\Else_;
+use SebastianBergmann\Type\NullType;
 
 class AddcourseController extends Controller
 {
@@ -139,10 +141,18 @@ class AddcourseController extends Controller
 
 
 
-     public function getUniqueBatchDetail()
+     public function getUniqueBatchDetail($department_id, $program_id = null)
      {
-       $studentSelectedSubjects = [];
-       $batchDetails = batch_detail::all()->unique('batchNo');
+         if($program_id != null){
+            $matching = ["department_id" => $department_id, "program_id" => $program_id];
+            $batchDetails = batch_detail::where($matching)->get();
+         }
+         else{
+            $batchDetails = batch_detail::where('department_id', $department_id)->get();
+         }
+
+         $batchDetails = $batchDetails->unique('batchNo');
+        
 
        // foreach ($batchDetails as $val) {
        //

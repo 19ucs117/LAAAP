@@ -236,20 +236,23 @@ class FileuploadController extends Controller
             'department_name'=>['required', 'regex:/^[a-zA-Z ]*$/'],
             'program_name'=>['required', 'regex:/^[a-zA-Z ]*$/'],
             'department_number' => ['required'],
+            'batch_number' => ['required'],
             'name' => ['required'],
             'section' => ['required'],
         ]);
         try {
-            $matching = ['department_name'=>trim(strtoupper($request->department_name)), 'program_name'=>trim(strtoupper($request->program_name))];
+            $matching = ['department_name'=>trim(strtoupper($request->department_name)), 'program_name'=>trim(strtoupper($request->program_name)), 'batchNo'=>$request->batch_number];
             $programData = Program::join('departments', 'departments.id', '=', 'programs.department_id')
-                                    ->select('programs.id', 'programs.department_id')
+                                    ->join('batch_details', 'batch_details.program_id', '=', 'programs.id')
+                                    ->select('batch_details.id', 'batch_details.department_id', 'batch_details.program_id')
                                     ->where($matching)->get();
             if(isset($programData[0])){
                 student_detail::create([
                     'id' => Str::uuid(),
                     'department_id' => $programData[0]->department_id,
-                    'program_id' => $programData[0]->id,
-                    'department_number' => strtoupper(trim($request['department_number'])),
+                    'program_id' => $programData[0]->program_id,
+                    'batch_id' => $programData[0]->id,
+                    'departmentNumber' => strtoupper(trim($request['department_number'])),
                     'name' => strtoupper(trim($request['name'])),
                     'section'=> strtoupper(trim($request['section'])),
                 ]);
@@ -268,7 +271,7 @@ class FileuploadController extends Controller
 
         }
 
-        return response()->json(['status' => $status,'message'=>$message]);
+        return response()->json(['status' => $programData,'message'=>$message]);
     }
 
     public function addSelectedCourseCSV(Request $request)
@@ -280,7 +283,7 @@ class FileuploadController extends Controller
             'course_code'=>['required'],
         ]);
         try {
-            $studentData = student_detail::where('department_number', trim(strtoupper($request->department_number)))->get();
+            $studentData = student_detail::where('departmentNumber', trim(strtoupper($request->department_number)))->get();
             $courseData = course_code::where('course_code', trim(strtoupper($request->course_code)))->get();
             if(isset($studentData[0])){
                 selected_subject::create([

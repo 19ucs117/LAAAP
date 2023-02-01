@@ -27,6 +27,7 @@ class CreatePocosTable extends Migration
             $table->foreign('course_id')->references('id')->on('course_codes')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
+            $table->unique(['course_id', 'school_id']);
 
         });
     }

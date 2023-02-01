@@ -27,6 +27,7 @@ class CreateCopsosTable extends Migration
             $table->foreign('program_id')->references('id')->on('programs')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
+            $table->unique(['course_id', 'program_id']);         
         });
     }
 

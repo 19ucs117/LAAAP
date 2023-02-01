@@ -27,6 +27,7 @@ class CreateWebReferencesTable extends Migration
             $table->foreign('department_id')->references('id')->on('departments')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
+            $table->unique(['course_id', 'department_id']);
         });
     }
 

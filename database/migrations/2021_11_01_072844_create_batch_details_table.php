@@ -26,7 +26,7 @@ class CreateBatchDetailsTable extends Migration
             $table->foreign('department_id')->references('id')->on('departments')
                                                           ->onUpdate('cascade')
                                                           ->onDelete('cascade');
-            $table->unique(['program_id', 'batchNo']);
+            $table->unique(['department_id', 'program_id', 'batchNo']);
         });
     }
 

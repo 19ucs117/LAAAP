@@ -21,8 +21,9 @@ class CreateMissionvisionpeosTable extends Migration
           $table->boolean('submit')->default(0);
           $table->timestamps();
           $table->foreign('school_id')->references('id')->on('schools')
-                                                          ->onUpdate('cascade')
-                                                          ->onDelete('cascade');
+                                                        ->onUpdate('cascade')
+                                                        ->onDelete('cascade');
+          $table->unique('school_id');
         });
     }
 
